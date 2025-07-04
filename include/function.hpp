@@ -1,20 +1,11 @@
 #pragma once
-#include <unistd.h>
 
-#include <algorithm>
-#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <ranges>
-#include <sstream>
 #include <string>
-#include <variant>
 #include <vector>
+#include <filesystem>
 
 #include "file.hpp"
 
@@ -62,3 +53,18 @@ private:
 };
 
 } // namespace analyser::function
+
+template <>
+struct std::formatter<analyser::function::Function> : std::formatter<std::string> {
+  template <typename FormatContext>
+  auto format(const analyser::function::Function &func, FormatContext &ctx) const {
+    std::string out = "{ filename: " + func.filename + ", class: ";
+    if (func.class_name.has_value()) {
+      out += func.class_name.value();
+    } else {
+      out += "None";
+    }
+    out += ", name: " + func.name + " }";
+    return formatter<std::string>::format(out, ctx);
+  }
+};

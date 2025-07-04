@@ -1,54 +1,75 @@
+#include <algorithm>
+#include <memory>
 #include <unistd.h>
 
-#include <algorithm>
-#include <array>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <functional>
-#include <iomanip>
-#include <iostream>
 #include <print>
-#include <ranges>
-#include <sstream>
-#include <string>
-#include <variant>
 #include <vector>
 
 #include "analyse.hpp"
 #include "cmd_options.hpp"
-#include "file.hpp"
-#include "function.hpp"
 #include "metric.hpp"
 #include "metric_accumulator.hpp"
-#include "metric_accumulator_impl/accumulators.hpp"
-#include "metric_impl/metrics.hpp"
+#include "metric_accumulator_formatter.hpp"
+#include "metric_accumulator_impl/average_accumulator.hpp"
+#include "metric_accumulator_impl/categorical_accumulator.hpp"
+#include "metric_accumulator_impl/sum_average_accumulator.hpp"
+#include "metric_impl/code_lines_count.hpp"
+#include "metric_impl/cyclomatic_complexity.hpp"
+#include "metric_impl/naming_style.hpp"
+#include "metric_impl/parameters_count.hpp"
 
 int main(int argc, char *argv[]) {
-    analyser::cmd::ProgramOptions options;
-    // распарсите входные параметры
-
-    // analyser::metric::MetricExtractor metric_extractor;
-    // зарегистрируйте метрики в metric_extractor
-
-    // запустите analyser::AnalyseFunctions
-    // выведете результаты анализа на консоль
-
-    // analyser::metric_accumulator::MetricsAccumulator accumulator;
-    // зарегистрируйте аккумуляторы метрик в accumulator
-
-    // запустите analyser::SplitByFiles
-    // запустите analyser::AccumulateFunctionAnalysis для каждого подмножества результатов метрик
-    // выведете результаты на консоль
-
-    // запустите analyser::SplitByClasses
-    // запустите analyser::AccumulateFunctionAnalysis для каждого подмножества результатов метрик
-    // выведете результаты на консоль
-
-    // запустите analyser::AccumulateFunctionAnalysis для всех результатов метрик
-    // выведете результаты на консоль
-
+  analyser::cmd::ProgramOptions options;
+  if (!options.Parse(argc, argv)) {
     return 0;
+  }
+
+  using namespace analyser::metric::metric_impl;
+  using namespace analyser::metric;
+  using namespace analyser::metric_accumulator::metric_accumulator_impl;
+
+  MetricExtractor metric_extractor;
+  metric_extractor.RegisterMetric(std::make_unique<CodeLinesCountMetric>());
+  metric_extractor.RegisterMetric(
+      std::make_unique<CyclomaticComplexityMetric>());
+  metric_extractor.RegisterMetric(std::make_unique<NamingStyleMetric>());
+  metric_extractor.RegisterMetric(std::make_unique<CountParametersMetric>());
+
+  auto files = options.GetFiles();
+  auto analyse = analyser::AnalyseFunctions(files, metric_extractor);
+
+  std::println("{}", analyse);
+
+  analyser::metric_accumulator::MetricsAccumulator accumulators;
+  accumulators.RegisterAccumulator("Average",
+                                   std::make_unique<AverageAccumulator>());
+  accumulators.RegisterAccumulator("SumAverage",
+                                   std::make_unique<SumAverageAccumulator>());
+  accumulators.RegisterAccumulator("Categorical",
+                                   std::make_unique<CategoricalAccumulator>());
+
+  // запустите analyser::SplitByFiles
+  rs::for_each(analyser::SplitByFiles(analyse), [&](const auto &file_analysis) {
+    accumulators.ResetAccumulators();
+    analyser::AccumulateFunctionAnalysis(file_analysis, accumulators);
+    std::println("Accumulated Analysis for file {}\n\t{}",
+                 file_analysis.front().first.filename, accumulators);
+  });
+
+  // запустите analyser::SplitByClasses
+  rs::for_each(
+      analyser::SplitByClasses(analyse), [&](const auto &class_analysis) {
+        accumulators.ResetAccumulators();
+        analyser::AccumulateFunctionAnalysis(class_analysis, accumulators);
+        std::println("Accumulated Analysis for class {}\n\t{}",
+                     class_analysis.front().first.class_name.value_or("N/A"),
+                     accumulators);
+      });
+
+  // запустите analyser::AccumulateFunctionAnalysis для всех результатов метрик
+  accumulators.ResetAccumulators();
+  analyser::AccumulateFunctionAnalysis(analyse, accumulators);
+  std::println("Accumulated Analysis for all functions:\n\t{}", accumulators);
+
+  return 0;
 }

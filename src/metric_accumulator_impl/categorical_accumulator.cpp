@@ -1,24 +1,35 @@
 #include "metric_accumulator_impl/categorical_accumulator.hpp"
+#include "metric_accumulator_impl/accumulators.hpp"
 
-#include <unistd.h>
-
-#include <algorithm>
-#include <array>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <ranges>
-#include <sstream>
 #include <string>
+#include <unistd.h>
 #include <variant>
-#include <vector>
 
 namespace analyser::metric_accumulator::metric_accumulator_impl {
 
-// здесь ваш код
+void CategoricalAccumulator::Accumulate(
+    const metric::MetricResult &metric_result) {
+  if (is_finalized) {
+    throw CUSTOM_EXCEPTION("CategoricalAccumulator has finalized!");
+  }
 
-}  // namespace analyser::metric_accumulator::metric_accumulator_impl
+  if (std::holds_alternative<std::string>(metric_result.value)) {
+    categories_freq[std::get<std::string>(metric_result.value)]++;
+  }
+};
+
+void CategoricalAccumulator::Finalize() { is_finalized = true; };
+
+void CategoricalAccumulator::Reset() {
+  categories_freq.clear();
+  is_finalized = false;
+};
+
+const CategoricalAccumulator::Container &CategoricalAccumulator::Get() const {
+  if (!is_finalized) {
+    throw CUSTOM_EXCEPTION("CategoricalAccumulator is not finalized!");
+  }
+  return categories_freq;
+};
+
+} // namespace analyser::metric_accumulator::metric_accumulator_impl

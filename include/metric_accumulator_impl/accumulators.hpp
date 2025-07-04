@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../metric_accumulator.hpp"
-#include "average_accumulator.hpp"
-#include "categorical_accumulator.hpp"
-#include "sum_average_accumulator.hpp"
+namespace analyser::metric_accumulator::metric_accumulator_impl {
+#define CUSTOM_EXCEPTION(message)                                              \
+  std::runtime_error(                                                            \
+      std::format("{}\nin file: {},\nfunction: {},\nnumber_line: {}", message, \
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__));
+} // namespace analyser::metric_accumulator::metric_accumulator_impl
