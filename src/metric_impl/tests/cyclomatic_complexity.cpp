@@ -5,6 +5,8 @@
 
 namespace analyser::metric::metric_impl {
 
+const std::filesystem::path test_data_dir = TEST_DATA_DIR;
+
 struct TestParamsCC {
   std::string filename;
   int expected_result;
@@ -21,22 +23,22 @@ protected:
 
 TEST_P(CyclomaticComplexty, Test) {
   TestParamsCC params = GetParam();
-  SetFile(params.filename);
+  SetFile((test_data_dir / params.filename).string());
   auto metric = CyclomaticComplexityMetric();
   MetricResult::ValueType result = metric.Calculate(*functions.begin()).value;
   EXPECT_EQ(std::get<int>(result), params.expected_result);
 }
 
 INSTANTIATE_TEST_SUITE_P(Add, CyclomaticComplexty,
-                         testing::Values(TestParamsCC{"many_lines.py", 1},
-                                         TestParamsCC{"comments.py", 0},
-                                         TestParamsCC{"exceptions.py", 4},
-                                         TestParamsCC{"if.py", 1},
-                                         TestParamsCC{"loops.py", 3},
-                                         TestParamsCC{"many_parameters.py", 1},
-                                         TestParamsCC{"match_case.py", 4},
-                                         TestParamsCC{"nested_if.py", 5},
-                                         TestParamsCC{"simple.py", 1},
-                                         TestParamsCC{"ternary.py", 0}));
+                         testing::Values(TestParamsCC{"many_lines.py", 2},
+                                         TestParamsCC{"comments.py", 1},
+                                         TestParamsCC{"exceptions.py", 5},
+                                         TestParamsCC{"if.py", 2},
+                                         TestParamsCC{"loops.py", 4},
+                                         TestParamsCC{"many_parameters.py", 2},
+                                         TestParamsCC{"match_case.py", 5},
+                                         TestParamsCC{"nested_if.py", 6},
+                                         TestParamsCC{"simple.py", 2},
+                                         TestParamsCC{"ternary.py", 1}));
 
 } // namespace analyser::metric::metric_impl

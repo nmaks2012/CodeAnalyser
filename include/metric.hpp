@@ -68,7 +68,7 @@ struct std::formatter<analyser::metric::MetricResults>
       } else {
         std::format_to(ctx.out(), "{}: {}", item.metric_name, "None");
       }
-      if(idx < results.size() - 1){
+      if (idx < results.size() - 1) {
         std::format_to(ctx.out(), "\n\t");
       } else {
         std::format_to(ctx.out(), "\n\n");
@@ -77,5 +77,4 @@ struct std::formatter<analyser::metric::MetricResults>
 
     return ctx.out();
   }
-  
 };

@@ -48,4 +48,4 @@ TEST(TestAverageAccumulator, GetNotFinalize) {
   EXPECT_THROW(accum.Get(), std::runtime_error);
 }
 
-}  // namespace analyser::metric_accumulator::metric_accumulator_impl::test
+} // namespace analyser::metric_accumulator::metric_accumulator_impl::test

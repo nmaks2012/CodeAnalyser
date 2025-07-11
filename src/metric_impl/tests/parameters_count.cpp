@@ -5,6 +5,8 @@
 
 namespace analyser::metric::metric_impl {
 
+const std::filesystem::path test_data_dir = TEST_DATA_DIR;
+
 struct TestParamsCP {
   std::string filename;
   int expected_result;
@@ -21,7 +23,7 @@ protected:
 
 TEST_P(CountParameters, Test) {
   TestParamsCP params = GetParam();
-  SetFile(params.filename);
+  SetFile((test_data_dir / params.filename).string());
   auto metric = CountParametersMetric();
   MetricResult::ValueType result = metric.Calculate(*functions.begin()).value;
   EXPECT_EQ(std::get<int>(result), params.expected_result);

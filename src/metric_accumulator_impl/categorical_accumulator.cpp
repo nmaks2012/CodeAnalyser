@@ -10,7 +10,7 @@ namespace analyser::metric_accumulator::metric_accumulator_impl {
 void CategoricalAccumulator::Accumulate(
     const metric::MetricResult &metric_result) {
   if (is_finalized) {
-    throw CUSTOM_EXCEPTION("CategoricalAccumulator has finalized!");
+    throw CustomException("CategoricalAccumulator has finalized!");
   }
 
   if (std::holds_alternative<std::string>(metric_result.value)) {
@@ -27,7 +27,7 @@ void CategoricalAccumulator::Reset() {
 
 const CategoricalAccumulator::Container &CategoricalAccumulator::Get() const {
   if (!is_finalized) {
-    throw CUSTOM_EXCEPTION("CategoricalAccumulator is not finalized!");
+    throw CustomException("CategoricalAccumulator is not finalized!");
   }
   return categories_freq;
 };

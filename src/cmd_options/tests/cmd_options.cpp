@@ -19,9 +19,7 @@ protected:
 
     args = list;
 
-    argv = args | std::views::transform([](const auto &arg) {
-             return (char *)arg.c_str();
-           }) |
+    argv = args | std::views::transform([](auto &arg) { return arg.data(); }) |
            std::ranges::to<std::vector<char *>>();
   }
   std::vector<char *> argv;

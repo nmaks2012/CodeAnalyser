@@ -9,6 +9,8 @@
 
 namespace analyser::metric::metric_impl {
 
+const std::filesystem::path test_data_dir = TEST_DATA_DIR;
+
 struct TestParamsCL {
   std::string filename;
   int expected_result;
@@ -25,7 +27,7 @@ protected:
 
 TEST_P(CodeLinesCount, Test) {
   TestParamsCL params = GetParam();
-  SetFile(params.filename);
+  SetFile((test_data_dir / params.filename).string());
   auto metric = CodeLinesCountMetric();
   MetricResult::ValueType result = metric.Calculate(*functions.begin()).value;
   EXPECT_EQ(std::get<int>(result), params.expected_result);
@@ -46,7 +48,8 @@ INSTANTIATE_TEST_SUITE_P(Add, CodeLinesCount,
 TEST(CodeLinesCount, ManyFunctions) {
 
   analyser::function::FunctionExtractor extractor;
-  std::vector<function::Function> functions = extractor.Get({"advanced_processor.py"});
+  std::vector<function::Function> functions =
+      extractor.Get((test_data_dir / "advanced_processor.py").string());
   auto metric = CodeLinesCountMetric();
   MetricResults result;
 
@@ -57,13 +60,11 @@ TEST(CodeLinesCount, ManyFunctions) {
   std::vector<int> expected_result{2, 2, 1, 5};
   auto zipped = rv::zip(result, expected_result);
 
-  EXPECT_TRUE( expected_result.size() == result.size());
-  EXPECT_TRUE(
-    rs::all_of(zipped, [](const auto& item){
-      const auto [res, expect] = item;
-      return std::get<int>(res.value) == expect;
-    })
-  );
+  EXPECT_TRUE(expected_result.size() == result.size());
+  EXPECT_TRUE(rs::all_of(zipped, [](const auto &item) {
+    const auto [res, expect] = item;
+    return std::get<int>(res.value) == expect;
+  }));
 }
 
 } // namespace analyser::metric::metric_impl

@@ -28,15 +28,17 @@ CountParametersMetric::CalculateImpl(const function::Function &f) const {
   }
 
   // Находим конец строки с "parameters:", чтобы начать поиск со следующей.
-  auto newline_it = rs::find(rs::subrange{start_search.begin(), f.ast.end()}, '\n');
+  auto newline_it =
+      rs::find(rs::subrange{start_search.begin(), f.ast.end()}, '\n');
   if (newline_it == f.ast.end()) {
     return 0; // Нет параметров на следующих строках
   }
 
   // Находим первый непробельный символ после этого \n.
-  auto first_non_space_it = rs::find_if(rs::subrange{newline_it + 1, end_search.begin()}, [](char c) {
-    return !std::isspace(static_cast<unsigned char>(c));
-  });
+  auto first_non_space_it =
+      rs::find_if(rs::subrange{newline_it + 1, end_search.begin()}, [](char c) {
+        return !std::isspace(static_cast<unsigned char>(c));
+      });
 
   // Расстояние между ними - это и есть отступ.
   const auto indent = std::distance(newline_it + 1, first_non_space_it);
@@ -57,7 +59,8 @@ CountParametersMetric::CalculateImpl(const function::Function &f) const {
                   "|typed_parameter"
                   "|typed_default_parameter"
                   "|list_splat_pattern"
-                  "|dictionary_splat_pattern)", indent);
+                  "|dictionary_splat_pattern)",
+                  indent);
 
   std::regex pattern_params(pattern_string);
 
@@ -71,8 +74,10 @@ CountParametersMetric::CalculateImpl(const function::Function &f) const {
   return params_count;
 };
 
-std::string CountParametersMetric::Name() const {
+std::string CountParametersMetric::StaticName() {
   return "CountParametersMetric";
 };
+
+std::string CountParametersMetric::Name() const { return StaticName(); };
 
 } // namespace analyser::metric::metric_impl

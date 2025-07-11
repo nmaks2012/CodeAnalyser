@@ -5,10 +5,11 @@
 #include <print>
 #include <string>
 
-
 namespace analyser::metric::metric_impl {
 
 using namespace std::literals;
+
+const std::filesystem::path test_data_dir = TEST_DATA_DIR;
 
 struct TestParamsNS {
   std::string filename;
@@ -26,7 +27,7 @@ protected:
 
 TEST_P(NamingStyle, Test) {
   TestParamsNS params = GetParam();
-  SetFile(params.filename);
+  SetFile((test_data_dir / params.filename).string());
   auto metric = NamingStyleMetric();
   MetricResult::ValueType result = metric.Calculate(*functions.begin()).value;
   EXPECT_EQ(std::get<std::string>(result), params.expected_result);
@@ -43,7 +44,6 @@ INSTANTIATE_TEST_SUITE_P(
                     TestParamsNS{"match_case.py", "UNKNOWN"s},
                     TestParamsNS{"nested_if.py", "PASCALCASE"s},
                     TestParamsNS{"simple.py", "SNAKECASE"s},
-                    TestParamsNS{"ternary.py", "UNKNOWN"s}
-                    ));
+                    TestParamsNS{"ternary.py", "UNKNOWN"s}));
 
 } // namespace analyser::metric::metric_impl

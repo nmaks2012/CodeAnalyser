@@ -15,7 +15,7 @@
                 "advanced_processor_1.py",
                 "advanced_processor_func.py"
             ],
-            "cwd": "${workspaceFolder}/build/src/analyse"
+            "cwd": "${workspaceFolder}/src/analyse/tests/files"
         },{
             "type": "lldb",
             "request": "launch",
@@ -30,8 +30,7 @@
             "name": "metric_test",
             "program": "${workspaceFolder}/build/src/metric_impl/metric_test",
             "args": [
-            ],
-            "cwd": "${workspaceFolder}/src/metric_impl/tests/files"
+            ]
         },{
             "type": "lldb",
             "request": "launch",

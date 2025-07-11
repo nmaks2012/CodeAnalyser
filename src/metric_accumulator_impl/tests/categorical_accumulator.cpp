@@ -25,16 +25,21 @@ TEST(TestCategoricalAccumulator, AccumulateString) {
   EXPECT_THROW(accum.Get(), std::runtime_error);
   accum.Finalize();
   EXPECT_EQ(accum.Get().size(), 2);
-  EXPECT_TRUE(accum.Get().contains("UNKNOWN") && accum.Get().at("UNKNOWN") == 2);
-  EXPECT_TRUE(accum.Get().contains("CAMELCASE") && accum.Get().at("CAMELCASE") == 1);
+  auto unknown = accum.Get().find("UNKNOWN");
+  EXPECT_TRUE(unknown != accum.Get().end() && unknown->second == 2);
+
+  auto camelcase = accum.Get().find("CAMELCASE");
+  EXPECT_TRUE(camelcase != accum.Get().end() && camelcase->second == 1);
 
   accum.Reset();
   accum.Accumulate({"name", "CAMELCASE"});
   accum.Accumulate({"name", "CAMELCASE"});
   EXPECT_THROW(accum.Get(), std::runtime_error);
   accum.Finalize();
+
   EXPECT_EQ(accum.Get().size(), 1);
-  EXPECT_TRUE(accum.Get().contains("CAMELCASE") && accum.Get().at("CAMELCASE") == 2);
+  auto camelcase2 = accum.Get().find("CAMELCASE");
+  EXPECT_TRUE(camelcase2 != accum.Get().end() && camelcase2->second == 2);
 }
 
 TEST(TestCategoricalAccumulator, AccumulateInt) {

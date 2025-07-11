@@ -8,10 +8,11 @@ namespace analyser::metric::metric_impl {
 
 struct CountParametersMetric final : public IMetric {
   virtual ~CountParametersMetric() = default;
+  static std::string StaticName();
 
 protected:
   MetricResult::ValueType CalculateImpl(const function::Function &f) const;
-  virtual std::string Name() const;
+  virtual std::string Name() const override;
 };
 
 } // namespace analyser::metric::metric_impl

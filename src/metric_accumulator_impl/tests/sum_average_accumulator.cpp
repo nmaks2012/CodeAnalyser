@@ -57,4 +57,4 @@ TEST(TestSumAverageAccumulator, Reset) {
   EXPECT_EQ(accum.Get().sum, 0);
 }
 
-}  // namespace analyser::metric_accumulator::metric_accumulator_impl::test
+} // namespace analyser::metric_accumulator::metric_accumulator_impl::test

@@ -10,7 +10,7 @@ using namespace std::literals;
 void SumAverageAccumulator::Accumulate(
     const metric::MetricResult &metric_result) {
   if (is_finalized) {
-    throw CUSTOM_EXCEPTION("SumAverageAccumulator has finalized!");
+    throw CustomException("SumAverageAccumulator has finalized!");
   }
   if (std::holds_alternative<int>(metric_result.value)) {
     sum += std::get<int>(metric_result.value);
@@ -34,7 +34,7 @@ void SumAverageAccumulator::Reset() {
 
 SumAverageAccumulator::SumAverage SumAverageAccumulator::Get() const {
   if (!is_finalized) {
-    throw CUSTOM_EXCEPTION("SumAverageAccumulator not finalize!");
+    throw CustomException("SumAverageAccumulator not finalize!");
   };
   return {sum, average};
 }

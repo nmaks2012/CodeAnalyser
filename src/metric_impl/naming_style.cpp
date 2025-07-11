@@ -18,15 +18,11 @@ NamingStyleMetric::CalculateImpl(const function::Function &f) const {
   bool unacceptable_first_symbol =
       std::isdigit(*f.name.begin()) || *f.name.begin() == '_';
 
-  // два "__" подряд
-  bool two_underscores = rs::adjacent_find(f.name, [](char a, char b) {
-                           return a == '_' && b == '_';
-                         }) != f.name.end();
-
-  // Две заглавные буквы подряд
-  bool two_uppercase = rs::adjacent_find(f.name, [](char a, char b) {
-                         return std::isupper(a) && std::isupper(b);
-                       }) != f.name.end();
+  // два "__" или 2 заглавные подряд
+  bool two_underscores_or_uppercase =
+      rs::adjacent_find(f.name, [](char a, char b) {
+        return a == '_' && b == '_' || std::isupper(a) && std::isupper(b);
+      }) != f.name.end();
 
   // Первый символ заглавная
   bool first_is_upper = std::isupper(*f.name.begin());
@@ -36,11 +32,10 @@ NamingStyleMetric::CalculateImpl(const function::Function &f) const {
       rs::any_of(f.name, [](char c) { return std::isupper(c); });
 
   // Есть нижние подчеркивания
-  bool exists_underscores =
-      rs::any_of(f.name, [](char c) { return c == '_'; });
+  bool exists_underscores = rs::any_of(f.name, [](char c) { return c == '_'; });
 
   // сразу отсекаем неизвестные случаи
-  if (unacceptable_first_symbol || two_underscores || two_uppercase) {
+  if (unacceptable_first_symbol || two_underscores_or_uppercase) {
     return "UNKNOWN"s;
   } else if (!exists_upper && !exists_underscores) {
     return "LOWERCASE"s;
@@ -55,6 +50,8 @@ NamingStyleMetric::CalculateImpl(const function::Function &f) const {
   }
 };
 
-std::string NamingStyleMetric::Name() const { return "NamingStyleMetric"; };
+std::string NamingStyleMetric::StaticName() { return "NamingStyleMetric"; };
+
+std::string NamingStyleMetric::Name() const { return StaticName(); };
 
 } // namespace analyser::metric::metric_impl

@@ -19,7 +19,8 @@ CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
 
   std::regex pattern_comment(
       "(expression_statement[\\W\\d\\n]+string|comment)"); // проверка вхождения
-                                                           // комментариев """ и #
+                                                           // комментариев """ и
+                                                           // #
 
   std::regex pattern_function("function_definition");
 
@@ -53,8 +54,10 @@ CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
   return static_cast<int>(rs::distance(lines));
 };
 
+std::string CodeLinesCountMetric::StaticName() { return "CodeLinesCountMetric"; };
+
 std::string CodeLinesCountMetric::Name() const {
-  return "CodeLinesCountMetric";
+  return StaticName();
 };
 
 } // namespace analyser::metric::metric_impl
