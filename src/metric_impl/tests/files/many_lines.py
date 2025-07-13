@@ -3,6 +3,7 @@ def testmultiline():
         1, 2, 3,
         4, 5, 6
     ]
+
     total = sum(data)
     
     print("Больше 10")

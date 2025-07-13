@@ -1,13 +1,65 @@
-
-
 #include "metric_accumulator_impl/categorical_accumulator.hpp"
+#include "metric.hpp"
 
 #include <gtest/gtest.h>
-
 #include <stdexcept>
 
-namespace analyser::metric_accumulator::metric_accumulator_impl::test {
+namespace analyser::metric_accumulator::metric_accumulator_impl {
 
-// здесь ваш код
+TEST(TestCategoricalAccumulator, AccumulateToFinalized) {
+  CategoricalAccumulator accum;
+  accum.Finalize();
+  EXPECT_THROW(accum.Accumulate({"name", "UNKNOWN"}), std::runtime_error);
+}
 
-}  // namespace analyser::metric_accumulator::metric_accumulator_impl::test
+TEST(TestCategoricalAccumulator, GetNonFinalize) {
+  CategoricalAccumulator accum;
+  EXPECT_THROW(accum.Get(), std::runtime_error);
+}
+
+TEST(TestCategoricalAccumulator, AccumulateString) {
+  CategoricalAccumulator accum;
+  accum.Accumulate({"name", "UNKNOWN"});
+  accum.Accumulate({"name", "UNKNOWN"});
+  accum.Accumulate({"name", "CAMELCASE"});
+  EXPECT_THROW(accum.Get(), std::runtime_error);
+  accum.Finalize();
+  EXPECT_EQ(accum.Get().size(), 2);
+  auto unknown = accum.Get().find("UNKNOWN");
+  EXPECT_TRUE(unknown != accum.Get().end() && unknown->second == 2);
+
+  auto camelcase = accum.Get().find("CAMELCASE");
+  EXPECT_TRUE(camelcase != accum.Get().end() && camelcase->second == 1);
+
+  accum.Reset();
+  accum.Accumulate({"name", "CAMELCASE"});
+  accum.Accumulate({"name", "CAMELCASE"});
+  EXPECT_THROW(accum.Get(), std::runtime_error);
+  accum.Finalize();
+
+  EXPECT_EQ(accum.Get().size(), 1);
+  auto camelcase2 = accum.Get().find("CAMELCASE");
+  EXPECT_TRUE(camelcase2 != accum.Get().end() && camelcase2->second == 2);
+}
+
+TEST(TestCategoricalAccumulator, AccumulateInt) {
+  CategoricalAccumulator accum;
+  accum.Accumulate({"name", 1});
+  accum.Accumulate({"name", 1});
+  accum.Finalize();
+  EXPECT_EQ(accum.Get().size(), 0);
+}
+
+TEST(TestCategoricalAccumulator, Reset) {
+
+  CategoricalAccumulator accum;
+  accum.Accumulate({"name", "UNKNOWN"});
+  accum.Accumulate({"name", "CAMELCASE"});
+  accum.Finalize();
+  accum.Reset();
+  EXPECT_THROW(accum.Get(), std::runtime_error);
+  accum.Finalize();
+  EXPECT_EQ(accum.Get().size(), 0);
+}
+
+} // namespace analyser::metric_accumulator::metric_accumulator_impl

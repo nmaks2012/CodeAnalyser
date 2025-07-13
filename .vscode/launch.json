@@ -8,15 +8,45 @@
             "type": "lldb",
             "request": "launch",
             "name": "Launch Analyser",
-            "program": "${workspaceFolder}/build/Analyser",
+            "program": "${workspaceFolder}/build/analyser",
             "args": [
-                "-i",
-                "input.txt",
-                "--command",
-                "checksum"
+                "-f",
+                "advanced_processor.py",
+                "advanced_processor_1.py",
+                "advanced_processor_func.py"
             ],
-            "cwd": "${workspaceFolder}/build"
+            "cwd": "${workspaceFolder}/src/analyse/tests/files"
+        },{
+            "type": "lldb",
+            "request": "launch",
+            "name": "cmd_options_test",
+            "program": "${workspaceFolder}/build/src/cmd_options/cmd_options_test",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}/build/src/cmd_options"
+        },{
+            "type": "lldb",
+            "request": "launch",
+            "name": "metric_test",
+            "program": "${workspaceFolder}/build/src/metric_impl/metric_test",
+            "args": [
+            ]
+        },{
+            "type": "lldb",
+            "request": "launch",
+            "name": "metric_accumulator",
+            "program": "${workspaceFolder}/build/src/metric_accumulator_impl/metric_accumulator_test",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}/build/src/metric_accumulator_impl"
+        },{
+            "type": "lldb",
+            "request": "launch",
+            "name": "analyse_test",
+            "program": "${workspaceFolder}/build/src/analyse/analyse_test",
+            "args": [
+            ],
+            "cwd": "${workspaceFolder}/build/src/analyse"
         }
-
     ]
 }
